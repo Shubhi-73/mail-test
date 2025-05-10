@@ -3,6 +3,12 @@ import { google, gmail_v1 } from 'googleapis';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
+import * as dotenv from 'dotenv';
+dotenv.config();
+// Load environment variables from .env file
+const CLIENT_ID = process.env.CLIENT_ID || '';
+const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
+const REDIRECT_URIS = process.env.REDIRECT_URIS ? process.env.REDIRECT_URIS.split(',') : [];
 
 // Type definitions
 interface Credentials {
@@ -31,15 +37,20 @@ async function getOAuth2Client() {
   // Path to credentials file (downloaded from Google Cloud Console)
   const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
   const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+  const client_id = CLIENT_ID || '';
+  const client_secret = CLIENT_SECRET || '';
+  const redirect_uris = REDIRECT_URIS.length > 0 ? REDIRECT_URIS : ['https://developers.google.com/oauthplayground'];
+
+
   
   // Load credentials from file
   const credentialsContent = fs.readFileSync(CREDENTIALS_PATH, 'utf-8');
   const credentials: Credentials = JSON.parse(credentialsContent);
-  const { client_secret, client_id, redirect_uris } = credentials.installed || credentials.web || { 
-    client_secret: '', 
-    client_id: '', 
-    redirect_uris: [''] 
-  };
+  // const { client_secret, client_id, redirect_uris } = credentials.installed || credentials.web || { 
+  //   client_secret: '', 
+  //   client_id: '', 
+  //   redirect_uris: [''] 
+  // };
   
   // Create OAuth2 client
   const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
@@ -47,11 +58,13 @@ async function getOAuth2Client() {
   // Check if we have a stored token
   try {
     const tokenContent = fs.readFileSync(TOKEN_PATH, 'utf-8');
-    const token: Token = JSON.parse(tokenContent);
+    //const token: Token = JSON.parse(tokenContent);
+    const token: Token = JSON.parse(process.env.TOKEN || tokenContent);
     oAuth2Client.setCredentials(token);
     return oAuth2Client;
   } catch (error) {
-    return getNewToken(oAuth2Client);
+    console.error('Error loading token:', error);
+    //return getNewToken(oAuth2Client);
   }
 }
 
@@ -96,8 +109,6 @@ async function sendEmail(to: string, subject: string, body: string) {
   const gmail = google.gmail({ version: 'v1', auth }) as gmail_v1.Gmail;
   
   // Construct the email
-  
-  
   const from = 'srivastava.snigdha519@gmail.com';
   
   
