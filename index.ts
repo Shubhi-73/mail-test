@@ -14,19 +14,6 @@ const CLIENT_ID = process.env.CLIENT_ID || '';
 const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
 const REDIRECT_URIS = process.env.REDIRECT_URIS ? process.env.REDIRECT_URIS.split(',') : [];
 
-// Type definitions
-interface Credentials {
-  installed?: {
-    client_id: string;
-    client_secret: string;
-    redirect_uris: string[];
-  };
-  web?: {
-    client_id: string;
-    client_secret: string;
-    redirect_uris: string[];
-  };
-}
 
 interface Token {
   access_token: string;
@@ -58,39 +45,39 @@ async function getOAuth2Client() {
 }
 
 // Function to get new OAuth2 token
-async function getNewToken(oAuth2Client: any) {
-  const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-  const SCOPES = ['https://www.googleapis.com/auth/gmail.send'];
+// async function getNewToken(oAuth2Client: any) {
+//   const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+//   const SCOPES = ['https://www.googleapis.com/auth/gmail.send'];
   
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  });
+//   const authUrl = oAuth2Client.generateAuthUrl({
+//     access_type: 'offline',
+//     scope: SCOPES,
+//   });
   
-  console.log('Authorize this app by visiting this URL:', authUrl);
+//   console.log('Authorize this app by visiting this URL:', authUrl);
   
-  // Get authorization code from user
-  const code = await new Promise<string>(resolve => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
+//   // Get authorization code from user
+//   const code = await new Promise<string>(resolve => {
+//     const rl = readline.createInterface({
+//       input: process.stdin,
+//       output: process.stdout,
+//     });
     
-    rl.question('Enter the code from that page here: ', (code) => {
-      rl.close();
-      resolve(code);
-    });
-  });
+//     rl.question('Enter the code from that page here: ', (code) => {
+//       rl.close();
+//       resolve(code);
+//     });
+//   });
   
-  const { tokens } = await oAuth2Client.getToken(code);
-  oAuth2Client.setCredentials(tokens);
+//   const { tokens } = await oAuth2Client.getToken(code);
+//   oAuth2Client.setCredentials(tokens);
   
-  // Save token for future use
-  fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
-  console.log('Token stored to', TOKEN_PATH);
+//   // Save token for future use
+//   fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
+//   console.log('Token stored to', TOKEN_PATH);
   
-  return oAuth2Client;
-}
+//   return oAuth2Client;
+// }
 
 // Function to send email
 async function sendEmail(to: string, subject: string, body: string) {
