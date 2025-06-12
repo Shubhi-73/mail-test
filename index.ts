@@ -32,10 +32,16 @@ async function getOAuth2Client() {
   
   // Create OAuth2 client
   const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-  
+  console.log('TOKEN is:', process.env.TOKEN?.slice(0, 20)); // just first few chars
+
   // Check if we have a stored token
   try {
-    const token: Token = JSON.parse(process.env.TOKEN || '{}') as Token;
+    if (!process.env.TOKEN) {
+      throw new Error('TOKEN env variable is missing. Did you forget to load .env or set it on Vercel?');
+    }
+    // const token: Token = JSON.parse(process.env.TOKEN || '{}') as Token;
+    const decoded = Buffer.from(process.env.TOKEN, 'base64').toString();
+    const token = JSON.parse(decoded);
     oAuth2Client.setCredentials(token);
     return oAuth2Client;
   } catch (error) {
