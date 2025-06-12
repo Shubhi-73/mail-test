@@ -151,6 +151,4 @@ app.get('/', (req: any, res: any) => {
   res.send('App started on root endpoint!');
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
-}); 
+
